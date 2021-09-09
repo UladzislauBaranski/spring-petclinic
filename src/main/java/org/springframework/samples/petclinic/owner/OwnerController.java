@@ -28,6 +28,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.validation.Valid;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,10 +44,12 @@ class OwnerController {
 
 	private final OwnerRepository owners;
 
+
 	private VisitRepository visits;
 
 	public OwnerController(OwnerRepository clinicService, VisitRepository visits) {
 		this.owners = clinicService;
+
 		this.visits = visits;
 	}
 

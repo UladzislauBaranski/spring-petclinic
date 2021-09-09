@@ -34,6 +34,12 @@
         th:replace="~{fragments/inputField :: input ('Date', 'date', 'date')}"  />
       <input
         th:replace="~{fragments/inputField :: input ('Description', 'description', 'text')}" />
+      <input hidden type="text" name="active" value="true">
+
+      <label for="vet">Vet</label>
+      <select type="text" name="vetId" id="vet" autocomplete="off" required>
+      </select>
+
     </div>
 
     <div class="form-group">
@@ -57,5 +63,39 @@
     </tr>
   </table>
 
+<!--  <script th:src="@{/templates/pets/js/selectVets.js}"></script>-->
+  <script>
+
+       async function getVet() {
+      let response = await fetch('http://localhost:8003/vets', {
+          method: 'get',
+      });
+
+      let vetsResponse = await response.json();
+           console.log(vetsResponse);
+           console.log(vetsResponse.vetList[0]);
+           // id.value = result.id;
+       //    let model = vetsResponse.map(item => item.vets.vetList.firstName);
+         //  console.log(model);
+
+           let vets = document.getElementById('vet');
+           vets.textContent = '';
+
+           let option = document.createElement("option");
+           option.text = 'Выберите значение';
+           option.value = "";
+           option.selected = true;
+           option.disabled = true;
+           option.hidden = true;
+           vets.appendChild(option);
+           for (let i = 0; i < vetsResponse.vetList.length; i++) {
+               let option = document.createElement("option");
+               option.value = vetsResponse.vetList[i].id;
+               option.text = vetsResponse.vetList[i].lastName;
+               vets.appendChild(option);
+           }
+  }
+   getVet();
+  </script>
 </body>
 </html>

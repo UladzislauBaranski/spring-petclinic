@@ -1,0 +1,104 @@
+<html xmlns:th="https://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+
+<body>
+<form class="form-horizontal" method="post" th:action="@{/ref/{visitId}(visitId=${visit.petId})}">
+  <input type="hidden" name="id" th:value="${visit.id}"/>
+  <!--      <input type="hidden" name="pet.id" th:value="${visit.pet.type.id}" />-->
+  <input type="hidden" name="owner.id" th:value="${visit.pet.owner.id}"/>
+  <div class="form-group has-feedback">
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Owner</label>
+      <div class="col-sm-10">
+        <!--            <span th:text="${visit.pet.owner.lastName}"></span>-->
+        <div id="owner_id" th:text="${visit.pet.owner.id}"></div>
+        <span th:text="${visit.pet.owner.lastName}"></span>
+      </div>
+    </div>
+    <input type="text" name="id" th:value="${visit.id}" hidden>
+    <input type="text" name="date" th:value="${visit.date}">
+    <input type="text" name="description" th:value="${visit.description}">
+
+    <label for="pet">Pet</label>
+    <select type="text" name="petId" id="pet" autocomplete="off" required value="1"
+            th:text="${visit.description}">
+    </select>
+
+    <label for="vet">Vet</label>
+    <select type="text" name="vetId" id="vet" autocomplete="off" required th:text="${visit.vet.lastName}">
+    </select>
+
+  </div>
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button class="btn btn-default" type="submit">Refactor Visit</button>
+    </div>
+  </div>
+</form>
+
+<script>
+
+    async function getVet() {
+        let response = await fetch('http://localhost:8003/vets', {
+            method: 'get',
+        });
+
+        let vetsResponse = await response.json();
+        console.log(vetsResponse);
+
+        let pets = document.getElementById('pet').value;
+        console.log("pets:" + pets);
+
+        let vets = document.getElementById('vet');
+        vets.textContent = '';
+
+        let option = document.createElement("option");
+        option.text = 'Выберите значение';
+        option.value = "";
+        option.selected = true;
+        option.disabled = true;
+        option.hidden = true;
+        vets.appendChild(option);
+        for (let i = 0; i < vetsResponse.vetList.length; i++) {
+            let option = document.createElement("option");
+            option.value = vetsResponse.vetList[i].id;
+            option.text = vetsResponse.vetList[i].lastName;
+            vets.appendChild(option);
+        }
+    }
+
+    getVet();
+</script>
+<script>
+
+    async function getPet() {
+        let ownerId = document.getElementById('owner_id').innerText;
+        let response = await fetch(`http://localhost:8003/api/pets/by-owner-id?id=${ownerId}`, {
+            method: 'get',
+        });
+
+        let petsResponse = await response.json();
+        console.log("petsResponse: ", petsResponse);
+
+        let pets = document.getElementById('pet');
+        pets.textContent = '';
+
+        let option = document.createElement("option");
+        option.text = 'Выберите значение';
+        option.value = "";
+        option.selected = true;
+        option.disabled = true;
+        option.hidden = true;
+        pets.appendChild(option);
+        for (let i = 0; i < petsResponse.length; i++) {
+            let option = document.createElement("option");
+            option.value = petsResponse[i].id;
+            option.text = petsResponse[i].name;
+            pets.appendChild(option);
+        }
+    }
+
+    getPet();
+</script>
+</body>
+</html>

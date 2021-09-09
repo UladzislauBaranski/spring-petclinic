@@ -15,13 +15,16 @@
  */
 package org.springframework.samples.petclinic.owner;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.validation.Valid;
 
+import org.springframework.samples.petclinic.vet.VetRepository;
 import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author Juergen Hoeller
@@ -43,10 +47,12 @@ class VisitController {
 	private final VisitRepository visits;
 
 	private final PetRepository pets;
+	private final VetRepository vet;
 
-	public VisitController(VisitRepository visits, PetRepository pets) {
+	public VisitController(VisitRepository visits, PetRepository pets, VetRepository vet) {
 		this.visits = visits;
 		this.pets = pets;
+		this.vet = vet;
 	}
 
 	@InitBinder
@@ -58,6 +64,7 @@ class VisitController {
 	 * Called before each and every @RequestMapping annotated method. 2 goals: - Make sure
 	 * we always have fresh data - Since we do not use the session scope, make sure that
 	 * Pet object always has an id (Even though id is not part of the form fields)
+	 *
 	 * @param petId
 	 * @return Pet
 	 */
@@ -82,10 +89,35 @@ class VisitController {
 	public String processNewVisitForm(@Valid Visit visit, BindingResult result) {
 		if (result.hasErrors()) {
 			return "pets/createOrUpdateVisitForm";
-		}
-		else {
+		} else {
 			this.visits.save(visit);
 			return "redirect:/owners/{ownerId}";
+		}
+	}
+
+	//@GetMapping("/owners/{ownerId}/pets/{petId}/visits{visitId}/edit")
+	@GetMapping("/owners/{ownerId}/pets/{petId}/visits/{visitId}/edit")
+	public String initEditVisitForm(@PathVariable("petId") int petId, Model model,
+									@PathVariable("ownerId") int ownerId, @PathVariable int visitId) {
+		Visit visitById = this.visits.findById(visitId);
+		model.addAttribute("visit", visitById);
+
+		Pet pet = this.pets.findById(petId);
+		pet.setVisitsInternal(this.visits.findByPetId(petId));
+		model.addAttribute("pet", pet);
+		return "pets/updateVisitForm";
+
+	}
+
+	@PostMapping("/ref/{petId}")
+	public String refactorVisit(@ModelAttribute(name = "visit") @Valid Visit visit, @PathVariable("petId") int petId, BindingResult result) {
+		if (result.hasErrors()) {
+			return "pets/createOrUpdateVisitForm";
+		} else {
+
+			this.visits.save(visit);
+			return "pets/createOrUpdateVisitForm";
+
 		}
 	}
 

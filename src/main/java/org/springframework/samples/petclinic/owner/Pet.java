@@ -35,6 +35,7 @@ import org.springframework.beans.support.MutableSortDefinition;
 import org.springframework.beans.support.PropertyComparator;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.samples.petclinic.model.NamedEntity;
+import org.springframework.samples.petclinic.vet.Vet;
 import org.springframework.samples.petclinic.visit.Visit;
 
 /**
@@ -60,6 +61,10 @@ public class Pet extends NamedEntity {
 	@JoinColumn(name = "owner_id")
 	private Owner owner;
 
+/*	@ManyToOne
+	@JoinColumn(name = "vet_id")
+	private Vet vet;*/
+
 	@Transient
 	private Set<Visit> visits = new LinkedHashSet<>();
 
@@ -83,9 +88,18 @@ public class Pet extends NamedEntity {
 		return this.owner;
 	}
 
-	protected void setOwner(Owner owner) {
+	public void setOwner(Owner owner) {
 		this.owner = owner;
 	}
+
+	/*public Vet getVet() {
+		return vet;
+	}
+
+	public void setVet(Vet vet) {
+		this.vet = vet;
+	}
+*/
 
 	protected Set<Visit> getVisitsInternal() {
 		if (this.visits == null) {

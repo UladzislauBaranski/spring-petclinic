@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -56,4 +57,6 @@ public interface PetRepository extends Repository<Pet, Integer> {
 	 */
 	void save(Pet pet);
 
+	@Query(value = "SELECT * FROM pets p where p.owner_id=:id", nativeQuery = true)
+	List<Pet> findPetById(@Param("id") int id);
 }

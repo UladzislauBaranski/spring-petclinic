@@ -18,8 +18,13 @@ package org.springframework.samples.petclinic.visit;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.samples.petclinic.model.BaseEntity;
+import org.springframework.samples.petclinic.owner.Pet;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Repository class for <code>Visit</code> domain objects All method names are compliant
@@ -43,4 +48,17 @@ public interface VisitRepository extends Repository<Visit, Integer> {
 
 	List<Visit> findByPetId(Integer petId);
 
+	Visit findById(Integer id);
+
+
+/*	@Query(value = "SELECT v.active FROM visits v where v.id=:id", nativeQuery = true)
+	Boolean getStatusActiveById(@Param("id") Integer visitId);*/
+
+	@Modifying
+	@Transactional
+	@Query(value = "UPDATE visits set active=:status  where id=:id", nativeQuery = true)
+	void getStatusActiveById(@Param("id") Integer visitId, @Param("status") Boolean status);
+
+
+	//Boolean up(@Param("id") Integer visitId, @Param("status") Boolean status);
 }
